@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hari's Momo n Crunch — Order</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;background:#fff8f1;color:#111827}.wrap{max-width:620px;margin:auto;padding:16px}
+.hero,.card{background:white;border-radius:20px;padding:18px;margin-bottom:15px;box-shadow:0 5px 18px #0001}.hero{background:#111827;color:white;text-align:center}
+.hero img{width:100%;max-width:520px;height:auto;border-radius:14px;display:block;margin:auto}.item{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid #eee}
+.qty,input,select{padding:10px;border-radius:9px;border:1px solid #ddd;box-sizing:border-box}input,select{width:100%;margin:6px 0 12px}
+button{width:100%;padding:14px;border:0;border-radius:12px;font-weight:bold;font-size:16px;margin-top:8px}.wa{background:#22c55e;color:white}.gold{background:#f59e0b;color:#111827}.muted{color:#6b7280;font-size:13px}
+</style></head><body><div class="wrap">
+<section class="hero"><img src="haris-business-card.png" alt="Hari's Momo n Crunch Digital Business Card"><h2>Fresh • Hot • Crunchy • Delivered</h2></section>
+<section class="card"><h2>🛒 Build Your Order</h2><p class="muted">All prices are for 1 plate.</p>
+<div class="item"><span>Mix Veg Momos<br><small>₹99</small></span><select class="qty" data-name="Mix Veg Momos" data-price="99"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div class="item"><span>Paneer Momos<br><small>₹149</small></span><select class="qty" data-name="Paneer Momos" data-price="149"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div class="item"><span>Chicken Momos<br><small>₹149</small></span><select class="qty" data-name="Chicken Momos" data-price="149"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div class="item"><span>Crunch Chat<br><small>₹99</small></span><select class="qty" data-name="Crunch Chat" data-price="99"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<div class="item"><span>Kurkure Chat<br><small>₹99</small></span><select class="qty" data-name="Kurkure Chat" data-price="99"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select></div>
+<h3>Total: <span id="total">₹0</span></h3></section>
+<section class="card"><h2>📍 Delivery Details</h2>
+<input id="name" placeholder="Your name"><input id="phone" placeholder="Your mobile number"><input id="address" placeholder="Apartment / Flat number"><input id="note" placeholder="Delivery note (optional)"><input id="ref" placeholder="Referral code (optional)">
+<select id="payment"><option>UPI / online payment</option><option>Cash on delivery</option></select>
+<button class="wa" id="order">📲 Place Order on WhatsApp</button><p class="muted">WhatsApp: +91 99400 24642</p></section>
+<section class="card"><h2>🎁 Refer & Earn</h2><p>Suggested launch benefit: ₹20 off for both customers after the new customer's first completed order.</p><button class="gold" id="refbtn">Create / Share Referral Code</button></section>
+</div>
+<script>
+const PHONE="919940024642",qs=[...document.querySelectorAll(".qty")];
+function calc(){return qs.reduce((a,e)=>a+Number(e.value)*Number(e.dataset.price),0)}
+function items(){return qs.filter(e=>+e.value>0).map(e=>({name:e.dataset.name,qty:+e.value,price:+e.dataset.price,total:+e.value*+e.dataset.price}))}
+function update(){document.getElementById("total").textContent="₹"+calc()} qs.forEach(e=>e.onchange=update);update();
+document.getElementById("order").onclick=()=>{
+const name=document.getElementById("name").value.trim(),phone=document.getElementById("phone").value.trim(),address=document.getElementById("address").value.trim(),note=document.getElementById("note").value.trim(),ref=document.getElementById("ref").value.trim().toUpperCase(),payment=document.getElementById("payment").value,list=items(),total=calc();
+if(!list.length||!name||!phone||!address){alert("Please select an item and enter name, mobile number and apartment/flat number.");return}
+const id="HM"+Date.now().toString().slice(-8);const order={id,date:new Date().toISOString(),name,phone,address,note,ref,payment,items:list,total,status:"Received"};const old=JSON.parse(localStorage.getItem("hariOrders")||"[]");old.push(order);localStorage.setItem("hariOrders",JSON.stringify(old));
+let msg=`🥟 HARI'S MOMO N CRUNCH — ORDER ${id}
+
+Customer: ${name}
+Mobile: ${phone}
+Delivery: ${address}
+
+ORDER:
+`;list.forEach(i=>msg+=`• ${i.name} × ${i.qty} = ₹${i.total}
+`);msg+=`
+TOTAL: ₹${total}
+Payment: ${payment}
+`;if(ref)msg+=`Referral: ${ref}
+`;if(note)msg+=`Note: ${note}
+`;msg+="
+Please confirm my order and delivery time. Thank you!";location.href="https://wa.me/"+PHONE+"?text="+encodeURIComponent(msg)};
+document.getElementById("refbtn").onclick=()=>{let code=localStorage.getItem("hariReferralCode");if(!code){code="HARI-"+Math.random().toString(36).slice(2,8).toUpperCase();localStorage.setItem("hariReferralCode",code)}const msg=`🥟 Try Hari's Momo n Crunch!
+Use my referral code: ${code}
+🎁 Suggested launch benefit: ₹20 off for both after the new customer's first completed order.
+Order here: ${location.href}`;location.href="https://wa.me/?text="+encodeURIComponent(msg)};
+</script></body></html>
